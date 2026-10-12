@@ -29,6 +29,11 @@ async function AdminContent() {
     .from("scans")
     .select("*", { count: "exact", head: true });
 
+  // Fetch count of reports
+  const { count: totalReports } = await supabaseAdmin
+    .from("reports")
+    .select("*", { count: "exact", head: true });
+
   return (
     <main className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-5xl mx-auto">
@@ -42,6 +47,7 @@ async function AdminContent() {
         <div className="grid grid-cols-2 gap-4 mb-8">
           <Stat label="Total images" value={images?.length ?? 0} />
           <Stat label="Total scans" value={totalScans ?? 0} />
+          <Stat label="Total reports" value={totalReports ?? 0} />
         </div>
 
         <h2 className="text-lg font-semibold mb-3">Recent uploads</h2>

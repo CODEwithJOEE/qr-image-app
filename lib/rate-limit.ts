@@ -64,3 +64,21 @@ export async function checkUploadRateLimit(
 
   return { ok: true };
 }
+export const reportLimiter = configured
+  ? new Ratelimit({
+      redis: redis!,
+      limiter: Ratelimit.slidingWindow(5, "1 h"),
+      prefix: "rl:report",
+      analytics: true,
+    })
+  : null;
+
+export async function checkReportRateLimit(
+  ip: string,
+): Promise<{ ok: true } | { ok: false; reset: number }> {
+  if (!reportLimiter) return { ok: true };
+
+  const result = await reportLimiter.limit(ip);
+  if (result.success) return { ok: true };
+  return { ok: false, reset: result.reset };
+}

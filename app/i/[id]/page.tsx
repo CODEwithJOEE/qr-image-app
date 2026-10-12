@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { trackScan } from "@/lib/track-scan";
+import ReportButton from "@/components/ReportButton";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -57,6 +58,11 @@ async function ImageContent({ params }: PageProps) {
           <a href={data.url} download className="text-blue-600 hover:underline">
             Download original
           </a>
+        </div>
+
+        {/* 👇 Report button */}
+        <div className="mt-4">
+          <ReportButton imageId={id} />
         </div>
       </div>
     </main>
