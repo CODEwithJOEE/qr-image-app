@@ -1,69 +1,52 @@
-import Image from "next/image";
+import UploadForm from "@/components/UploadForm";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="max-w-3xl mx-auto px-6 py-16">
+        <header className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">
+            Turn any image into a <span className="text-blue-600">QR code</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-4 text-lg text-slate-600 max-w-xl mx-auto">
+            Upload a picture, get a scannable QR code. Anyone who scans it will
+            see your image instantly.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        </header>
+
+        <UploadForm />
+
+        <section className="mt-16 grid sm:grid-cols-3 gap-6 text-center">
+          {[
+            { step: "1", title: "Upload", desc: "Drop any image up to 5 MB" },
+            {
+              step: "2",
+              title: "Generate",
+              desc: "We create a QR code for you",
+            },
+            {
+              step: "3",
+              title: "Share",
+              desc: "Download the PNG and share it",
+            },
+          ].map((s) => (
+            <div
+              key={s.step}
+              className="rounded-xl border border-slate-200 bg-white p-5"
+            >
+              <div className="w-8 h-8 mx-auto mb-3 rounded-full bg-blue-100 text-blue-700 font-semibold flex items-center justify-center text-sm">
+                {s.step}
+              </div>
+              <h3 className="font-semibold text-slate-900">{s.title}</h3>
+              <p className="text-sm text-slate-600 mt-1">{s.desc}</p>
+            </div>
+          ))}
+        </section>
+
+        <footer className="mt-16 text-center text-xs text-slate-400">
+          Images are hosted publicly. Anyone with the QR code can view them.
+        </footer>
+      </div>
+    </main>
   );
 }
