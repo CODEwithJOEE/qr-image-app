@@ -13,7 +13,15 @@ import {
   Line,
   CartesianGrid,
 } from "recharts";
-
+import {
+  Image as ImageIcon,
+  ScanLine,
+  Calendar,
+  TrendingUp,
+  Users,
+  Clock,
+  BarChart3,
+} from "lucide-react";
 type Summary = {
   totalImages: number;
   totalScans: number;
@@ -47,16 +55,34 @@ export default function StatsDashboard({
 }) {
   return (
     <div className="space-y-8">
-      {/* Top summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total images" value={summary.totalImages} />
-        <StatCard label="Total scans" value={summary.totalScans} />
-        <StatCard label="Scans today" value={summary.scansToday} />
-        <StatCard label="Scans this week" value={summary.scansThisWeek} />
+        <StatCard
+          label="Total images"
+          value={summary.totalImages}
+          icon={<ImageIcon className="w-5 h-5 text-blue-500" />}
+        />
+        <StatCard
+          label="Total scans"
+          value={summary.totalScans}
+          icon={<ScanLine className="w-5 h-5 text-purple-500" />}
+        />
+        <StatCard
+          label="Scans today"
+          value={summary.scansToday}
+          icon={<Calendar className="w-5 h-5 text-green-500" />}
+        />
+        <StatCard
+          label="Scans this week"
+          value={summary.scansThisWeek}
+          icon={<TrendingUp className="w-5 h-5 text-amber-500" />}
+        />
       </div>
 
       {/* Line chart — scans last 30 days */}
-      <Card title="Scans over the last 30 days">
+      <Card
+        title="Scans over the last 30 days"
+        icon={<TrendingUp className="w-4 h-4 text-blue-500" />}
+      >
         {scansByDay.length === 0 ? (
           <Empty />
         ) : (
@@ -94,7 +120,10 @@ export default function StatsDashboard({
       </Card>
 
       {/* Bar chart — top 10 images */}
-      <Card title="Top 10 most-scanned images">
+      <Card
+        title="Top 10 most-scanned images"
+        icon={<BarChart3 className="w-4 h-4 text-purple-500" />}
+      >
         {topImages.length === 0 ? (
           <Empty />
         ) : (
@@ -137,7 +166,10 @@ export default function StatsDashboard({
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Referrers */}
-        <Card title="Top referrers">
+        <Card
+          title="Top referrers"
+          icon={<Users className="w-4 h-4 text-green-500" />}
+        >
           {topReferrers.length === 0 ? (
             <Empty />
           ) : (
@@ -158,7 +190,10 @@ export default function StatsDashboard({
         </Card>
 
         {/* Recent scans */}
-        <Card title="Recent scans">
+        <Card
+          title="Recent scans"
+          icon={<Clock className="w-4 h-4 text-amber-500" />}
+        >
           {recentScans.length === 0 ? (
             <Empty />
           ) : (
@@ -194,25 +229,43 @@ export default function StatsDashboard({
 
 // ---- Small helpers ----
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: number;
+  icon?: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4">
-      <p className="text-xs uppercase text-slate-500 tracking-wide">{label}</p>
-      <p className="text-2xl font-bold text-slate-900 mt-1">{value}</p>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs uppercase text-slate-500 tracking-wide">
+          {label}
+        </p>
+        {icon}
+      </div>
+      <p className="text-2xl font-bold text-slate-900">{value}</p>
     </div>
   );
 }
 
 function Card({
   title,
+  icon,
   children,
 }: {
   title: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5">
-      <h2 className="text-sm font-semibold text-slate-700 mb-4">{title}</h2>
+      <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-4">
+        {icon}
+        {title}
+      </h2>
       {children}
     </div>
   );

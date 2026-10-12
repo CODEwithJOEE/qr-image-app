@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { validateImage, MAX_FILE_SIZE } from "@/lib/validation";
 import { useRouter } from "next/navigation";
+import { Upload, ImagePlus, X, QrCode } from "lucide-react";
 
 type Status = "idle" | "validating" | "uploading" | "error";
 
@@ -150,26 +151,17 @@ export default function UploadForm() {
                 e.stopPropagation();
                 reset();
               }}
-              className="text-xs text-red-600 hover:underline"
+              className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
             >
+              <X className="w-3.5 h-3.5" />
               Remove & choose another
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 pointer-events-none">
-            <svg
-              className="w-12 h-12 text-slate-400"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 7.5m0 0L7.5 12m4.5-4.5v9"
-              />
-            </svg>
+            <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mb-2">
+              <Upload className="w-6 h-6 text-blue-600" />
+            </div>
             <p className="text-base font-medium text-slate-700">
               Drag &amp; drop your image here
             </p>
@@ -198,9 +190,20 @@ export default function UploadForm() {
           "w-full py-3 rounded-xl font-medium transition-all",
           "bg-blue-600 text-white hover:bg-blue-700",
           "disabled:bg-slate-300 disabled:cursor-not-allowed",
+          "flex items-center justify-center gap-2",
         ].join(" ")}
       >
-        {status === "uploading" ? "Generating QR code…" : "Generate QR Code"}
+        {status === "uploading" ? (
+          <>
+            <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Generating QR code…
+          </>
+        ) : (
+          <>
+            <QrCode className="w-4 h-4" />
+            Generate QR Code
+          </>
+        )}
       </button>
     </form>
   );

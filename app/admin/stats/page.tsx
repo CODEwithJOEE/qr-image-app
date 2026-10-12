@@ -5,6 +5,16 @@ import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/require-admin";
 import StatsDashboard from "@/components/StatsDashboard";
+import {
+  ArrowLeft,
+  Image as ImageIcon,
+  ScanLine,
+  Calendar,
+  TrendingUp,
+  BarChart3,
+  Users,
+  Clock,
+} from "lucide-react";
 
 export default function StatsPage() {
   return (
@@ -137,11 +147,16 @@ async function StatsContent() {
     <main className="min-h-screen bg-slate-50 p-6 sm:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <BarChart3 className="w-6 h-6 text-blue-600" />
             Analytics Dashboard
           </h1>
-          <Link href="/admin" className="text-sm text-blue-600 hover:underline">
-            ← Back to Admin
+          <Link
+            href="/admin"
+            className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Admin
           </Link>
         </div>
 
