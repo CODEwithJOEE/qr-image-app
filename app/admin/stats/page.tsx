@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/require-admin";
+import StatsDashboard from "@/components/StatsDashboard";
 
 export default function StatsPage() {
   return (
@@ -18,63 +19,139 @@ async function StatsContent() {
     redirect("/admin/login");
   }
 
+  // 1. All images
   const { data: images } = await supabaseAdmin
     .from("images")
     .select("id, created_at")
     .order("created_at", { ascending: false });
 
+  // 2. All scans (last 30 days only to keep payload small)
+  const thirtyDaysAgo = new Date(
+    Date.now() - 30 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
   const { data: scans } = await supabaseAdmin
     .from("scans")
-    .select("image_id, scanned_at");
+    .select("id, image_id, scanned_at, referrer, country")
+    .gte("scanned_at", thirtyDaysAgo)
+    .order("scanned_at", { ascending: false });
 
-  // Count scans per image
-  const scanCounts = new Map<string, number>();
-  for (const s of scans ?? []) {
-    scanCounts.set(s.image_id, (scanCounts.get(s.image_id) ?? 0) + 1);
+  // 3. Total scan count all-time
+  const { count: totalScans } = await supabaseAdmin
+    .from("scans")
+    .select("*", { count: "exact", head: true });
+
+  // ---- Compute derived data ----
+
+  const now = new Date();
+  const todayStart = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  ).getTime();
+  const weekStart = todayStart - 6 * 24 * 60 * 60 * 1000;
+
+  let scansToday = 0;
+  let scansThisWeek = 0;
+
+  // Scans per image (for top 10)
+  const scansByImage = new Map<string, number>();
+
+  // Scans per day (for line chart, last 30 days)
+  const scansByDay = new Map<string, number>();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    const key = d.toISOString().slice(0, 10);
+    scansByDay.set(key, 0);
   }
 
-  const rows = (images ?? []).map((img) => ({
-    id: img.id,
-    created_at: img.created_at,
-    scans: scanCounts.get(img.id) ?? 0,
+  // Referrer counts
+  const referrerCounts = new Map<string, number>();
+
+  for (const s of scans ?? []) {
+    const t = new Date(s.scanned_at).getTime();
+    if (t >= todayStart) scansToday++;
+    if (t >= weekStart) scansThisWeek++;
+
+    scansByImage.set(s.image_id, (scansByImage.get(s.image_id) ?? 0) + 1);
+
+    const dayKey = new Date(s.scanned_at).toISOString().slice(0, 10);
+    if (scansByDay.has(dayKey)) {
+      scansByDay.set(dayKey, (scansByDay.get(dayKey) ?? 0) + 1);
+    }
+
+    // Parse referrer into a friendly source
+    let source = "Direct";
+    if (s.referrer) {
+      try {
+        const refUrl = new URL(s.referrer);
+        source = refUrl.hostname.replace(/^www\./, "");
+      } catch {
+        source = "Unknown";
+      }
+    }
+    referrerCounts.set(source, (referrerCounts.get(source) ?? 0) + 1);
+  }
+
+  // Top 10 images by scans
+  const topImages = Array.from(scansByImage.entries())
+    .map(([id, count]) => ({ id, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  // Scans by day array for chart
+  const scansByDayArray = Array.from(scansByDay.entries()).map(
+    ([date, count]) => ({
+      date,
+      label: new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      count,
+    }),
+  );
+
+  // Top referrers
+  const topReferrers = Array.from(referrerCounts.entries())
+    .map(([source, count]) => ({ source, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  // Recent scans
+  const recentScans = (scans ?? []).slice(0, 20).map((s) => ({
+    id: s.id,
+    imageId: s.image_id,
+    scannedAt: s.scanned_at,
+    referrer: s.referrer,
+    country: s.country,
   }));
 
-  const totalScans = scans?.length ?? 0;
+  const summary = {
+    totalImages: images?.length ?? 0,
+    totalScans: totalScans ?? 0,
+    scansToday,
+    scansThisWeek,
+  };
 
   return (
-    <main className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-slate-50 p-6 sm:p-8">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Scan Statistics</h1>
+          <h1 className="text-2xl font-bold text-slate-900">
+            Analytics Dashboard
+          </h1>
           <Link href="/admin" className="text-sm text-blue-600 hover:underline">
             ← Back to Admin
           </Link>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6">
-          <p className="text-xs uppercase text-slate-500">Total scans</p>
-          <p className="text-2xl font-bold mt-1">{totalScans}</p>
-        </div>
-
-        {rows.length === 0 ? (
-          <p className="text-sm text-slate-500">No images yet.</p>
-        ) : (
-          <ul className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
-            {rows.map((r) => (
-              <li key={r.id} className="flex items-center justify-between p-3">
-                <div>
-                  <p className="text-sm font-mono">{r.id}</p>
-                  <p className="text-xs text-slate-500">
-                    {new Date(r.created_at).toLocaleString()}
-                  </p>
-                </div>
-                <span className="text-sm font-semibold">
-                  {r.scans} scan{r.scans === 1 ? "" : "s"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <StatsDashboard
+          summary={summary}
+          topImages={topImages}
+          scansByDay={scansByDayArray}
+          topReferrers={topReferrers}
+          recentScans={recentScans}
+        />
       </div>
     </main>
   );

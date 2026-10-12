@@ -51,14 +51,13 @@ export async function GET(req: NextRequest) {
     return `${row.id}.${ext}`;
   });
 
-  // 3. Delete from storage (best-effort, log failures)
+  // 3. Delete from storage (best-effort)
   const { error: storageErr } = await supabaseAdmin.storage
     .from("images")
     .remove(paths);
 
   if (storageErr) {
     console.error("Storage cleanup failed:", storageErr);
-    // Continue anyway — DB rows will be deleted next
   }
 
   // 4. Delete DB rows (scans + reports cascade)
