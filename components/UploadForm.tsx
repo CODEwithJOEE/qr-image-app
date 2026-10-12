@@ -85,7 +85,12 @@ export default function UploadForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Upload failed. Please try again.");
+        // Rate limit errors get a distinct message
+        if (res.status === 429) {
+          setError(data.error || "Too many uploads. Please wait a bit.");
+        } else {
+          setError(data.error || "Upload failed. Please try again.");
+        }
         setStatus("error");
         return;
       }

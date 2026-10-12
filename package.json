@@ -11,6 +11,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
     "@tailwindcss/postcss": "^4.3.3",
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
     "nanoid": "^6.0.2",
     "next": "16.4.0",
     "postcss": "^8.5.29",
