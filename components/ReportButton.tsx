@@ -45,7 +45,7 @@ export default function ReportButton({ imageId }: { imageId: string }) {
   // Already reported — show a thank-you
   if (status === "done") {
     return (
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-400">
         ✓ Thanks — this report has been sent for review.
       </p>
     );
@@ -56,7 +56,7 @@ export default function ReportButton({ imageId }: { imageId: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="text-xs text-slate-400 hover:text-red-600 hover:underline"
+        className="text-xs text-slate-500 hover:text-red-400 hover:underline"
       >
         ⚑ Report this image
       </button>
@@ -65,7 +65,7 @@ export default function ReportButton({ imageId }: { imageId: string }) {
 
   // Expanded: reason + notes
   return (
-    <div className="mt-2 rounded-lg border border-slate-200 bg-white p-4 text-left max-w-md">
+    <div className="mt-2 rounded-lg border border-slate-700 bg-slate-800 p-4 text-left max-w-md text-slate-100">
       <p className="text-sm font-medium text-slate-900 mb-3">
         Why are you reporting this image?
       </p>
@@ -73,7 +73,7 @@ export default function ReportButton({ imageId }: { imageId: string }) {
       <select
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 mb-3"
+        className="w-full text-sm border border-slate-600 bg-slate-900 text-slate-100 rounded-lg px-3 py-2 mb-3"
         disabled={status === "submitting"}
       >
         {REASONS.map((r) => (
@@ -103,7 +103,7 @@ export default function ReportButton({ imageId }: { imageId: string }) {
             setError("");
           }}
           disabled={status === "submitting"}
-          className="text-sm px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100"
+          className="text-sm px-3 py-1.5 rounded-lg text-slate-300 hover:bg-slate-700"
         >
           Cancel
         </button>

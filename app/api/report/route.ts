@@ -43,8 +43,7 @@ export async function POST(req: NextRequest) {
     const { error } = await supabaseAdmin.from("reports").insert({
       image_id: imageId,
       reason,
-      // store notes in a column we haven't added yet — we'll add it below
-      // notes: safeNotes,
+      notes: safeNotes,
     });
 
     if (error) {
