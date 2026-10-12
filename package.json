@@ -16,6 +16,7 @@
     "nanoid": "^6.0.2",
     "next": "16.4.0",
     "postcss": "^8.5.29",
+    "qr-code-styling": "^1.9.2",
     "qrcode": "^1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",

@@ -49,6 +49,22 @@ async function ImageContent({ params }: PageProps) {
   // Fire-and-forget scan tracking
   trackScan(id);
 
+  function getExpiryInfo(createdAt: string): string | null {
+    const days = parseInt(process.env.IMAGE_RETENTION_DAYS ?? "0", 10);
+    if (!days || days <= 0) return null;
+
+    const expiresAt = new Date(
+      new Date(createdAt).getTime() + days * 24 * 60 * 60 * 1000,
+    );
+    const now = new Date();
+    const remainingMs = expiresAt.getTime() - now.getTime();
+
+    if (remainingMs <= 0) return "Expired";
+
+    const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
+    return `Expires in ${remainingDays} day${remainingDays === 1 ? "" : "s"}`;
+  }
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
       {/* Header */}
@@ -80,7 +96,14 @@ async function ImageContent({ params }: PageProps) {
       {/* Footer */}
       <footer className="border-t border-slate-800">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between text-xs text-slate-500">
-          <p>Shared on {new Date(data.created_at).toLocaleDateString()}</p>
+          <p>
+            Shared on {new Date(data.created_at).toLocaleDateString()}
+            {(() => {
+              const info = getExpiryInfo(data.created_at);
+              if (!info) return null;
+              return <span className="text-amber-400"> · {info}</span>;
+            })()}
+          </p>
           <ReportButton imageId={id} />
         </div>
       </footer>
